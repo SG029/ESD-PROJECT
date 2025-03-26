@@ -13,7 +13,6 @@ class DivingMonitorApp:
         self.root.geometry("1000x700")
         self.root.configure(bg='#003366')
         
-        # Initialize variables
         self.spo2 = 98
         self.current_depth = 0
         self.ascent_rate = 0
@@ -22,14 +21,12 @@ class DivingMonitorApp:
         self.decompression_stop_depth = 0
         self.decompression_stop_time = 0
         
-        # Create main containers
         self.create_header()
         self.create_metrics_display()
         self.create_depth_chart()
         self.create_decompression_panel()
         self.create_alert_panel()
         
-        # Start data simulation
         self.simulate_dive()
     
     def create_header(self):
@@ -45,7 +42,6 @@ class DivingMonitorApp:
         )
         title_label.pack(pady=10)
         
-        # Current time display
         self.time_label = tk.Label(
             header_frame, 
             text="", 
@@ -60,7 +56,6 @@ class DivingMonitorApp:
         metrics_frame = tk.Frame(self.root, bg='#003366')
         metrics_frame.pack(fill=tk.X, padx=10, pady=10)
         
-        # SpO2 Display
         spo2_frame = tk.Frame(metrics_frame, bg='#004080', bd=2, relief=tk.RIDGE)
         spo2_frame.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
         
@@ -81,7 +76,6 @@ class DivingMonitorApp:
         )
         self.spo2_label.pack(pady=(0,5))
         
-        # Heart Rate Display
         hr_frame = tk.Frame(metrics_frame, bg='#004080', bd=2, relief=tk.RIDGE)
         hr_frame.grid(row=0, column=1, padx=5, pady=5, sticky="nsew")
         
@@ -102,7 +96,6 @@ class DivingMonitorApp:
         )
         self.hr_label.pack(pady=(0,5))
         
-        # Ascent Rate Display
         ascent_frame = tk.Frame(metrics_frame, bg='#004080', bd=2, relief=tk.RIDGE)
         ascent_frame.grid(row=0, column=2, padx=5, pady=5, sticky="nsew")
         
@@ -123,7 +116,6 @@ class DivingMonitorApp:
         )
         self.ascent_label.pack(pady=(0,5))
         
-        # Current Depth Display
         depth_frame = tk.Frame(metrics_frame, bg='#004080', bd=2, relief=tk.RIDGE)
         depth_frame.grid(row=0, column=3, padx=5, pady=5, sticky="nsew")
         
@@ -144,7 +136,6 @@ class DivingMonitorApp:
         )
         self.depth_label.pack(pady=(0,5))
         
-        # Configure grid weights
         for i in range(4):
             metrics_frame.columnconfigure(i, weight=1)
     
@@ -152,7 +143,6 @@ class DivingMonitorApp:
         chart_frame = tk.Frame(self.root, bg='#003366')
         chart_frame.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
-        # Create figure for matplotlib
         self.fig, self.ax = plt.subplots(figsize=(8, 4), facecolor='#003366')
         self.ax.set_facecolor('#003366')
         self.ax.invert_yaxis()
@@ -165,16 +155,13 @@ class DivingMonitorApp:
         self.ax.spines['right'].set_color('white')
         self.ax.spines['left'].set_color('white')
         
-        # Initialize empty plot
         self.depth_line, = self.ax.plot([], [], 'c-', linewidth=2)
         self.current_pos = self.ax.plot([], [], 'ro')[0]
         
-        # Embed matplotlib figure in Tkinter
         self.canvas = FigureCanvasTkAgg(self.fig, master=chart_frame)
         self.canvas.draw()
         self.canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
         
-        # Initialize data for plotting
         self.depth_data = []
         self.time_data = []
         self.start_time = time.time()
@@ -191,7 +178,6 @@ class DivingMonitorApp:
             bg='#004080'
         ).pack(pady=(5,0))
         
-        # Decompression stop info
         self.deco_info_label = tk.Label(
             deco_frame, 
             text="No decompression stop required", 
@@ -201,7 +187,6 @@ class DivingMonitorApp:
         )
         self.deco_info_label.pack(pady=5)
         
-        # Detailed decompression info
         deco_details_frame = tk.Frame(deco_frame, bg='#004080')
         deco_details_frame.pack(pady=5)
         
@@ -266,7 +251,7 @@ class DivingMonitorApp:
             bg='#660000'
         )
         self.alert_label.pack(pady=5)
-        self.alert_frame.pack_forget()  # Hide initially
+        self.alert_frame.pack_forget()
     
     def update_time(self):
         current_time = time.strftime("%H:%M:%S")
@@ -275,57 +260,49 @@ class DivingMonitorApp:
     
     def get_spo2_color(self):
         if self.spo2 >= 95:
-            return '#00ff00'  # Green (normal)
+            return '#00ff00'
         elif 90 <= self.spo2 < 95:
-            return '#ffff00'  # Yellow (caution)
+            return '#ffff00'
         else:
-            return '#ff0000'  # Red (danger)
+            return '#ff0000'
     
     def get_hr_color(self):
         if 60 <= self.heart_rate <= 100:
-            return '#00ff00'  # Green (normal)
+            return '#00ff00'
         elif 40 <= self.heart_rate < 60 or 100 < self.heart_rate <= 120:
-            return '#ffff00'  # Yellow (caution)
+            return '#ffff00'
         else:
-            return '#ff0000'  # Red (danger)
+            return '#ff0000'
     
     def get_ascent_color(self):
         if self.ascent_rate <= 9:
-            return '#00ff00'  # Green (safe)
+            return '#00ff00'
         elif 9 < self.ascent_rate <= 18:
-            return '#ffff00'  # Yellow (caution)
+            return '#ffff00'
         else:
-            return '#ff0000'  # Red (danger)
+            return '#ff0000'
     
     def update_metrics(self):
-        # Update labels with current values
         self.spo2_label.config(text=f"{self.spo2}%", fg=self.get_spo2_color())
         self.hr_label.config(text=f"{self.heart_rate} BPM", fg=self.get_hr_color())
         self.ascent_label.config(text=f"{self.ascent_rate} m/min", fg=self.get_ascent_color())
         self.depth_label.config(text=f"{self.current_depth} m")
         
-        # Update decompression information
         self.update_decompression_info()
-        
-        # Update depth chart
         self.update_depth_chart()
-        
-        # Check for alerts
         self.check_alerts()
     
     def update_decompression_info(self):
-        # Simplified decompression model
         if self.current_depth > 30 and not self.decompression_stop_active:
             self.decompression_stop_active = True
-            self.decompression_stop_depth = 5  # Standard safety stop
-            self.decompression_stop_time = 3  # 3 minutes
+            self.decompression_stop_depth = 5
+            self.decompression_stop_time = 3
             
             self.deco_info_label.config(text="DECOMPRESSION STOP REQUIRED!")
             self.next_stop_label.config(text=f"{self.decompression_stop_depth} m")
             self.stop_depth_label.config(text=f"{self.decompression_stop_depth} m")
             self.stop_time_label.config(text=f"{self.decompression_stop_time} min")
         elif self.current_depth <= 5 and self.decompression_stop_active:
-            # Count down decompression time
             if self.decompression_stop_time > 0:
                 self.decompression_stop_time -= 0.1
                 self.stop_time_label.config(text=f"{max(0, self.decompression_stop_time):.1f} min")
@@ -337,30 +314,24 @@ class DivingMonitorApp:
                 self.stop_time_label.config(text="0 min")
     
     def update_depth_chart(self):
-        # Add current data point
         current_time = time.time() - self.start_time
         self.time_data.append(current_time)
         self.depth_data.append(self.current_depth)
         
-        # Keep only the last 100 points for display
         if len(self.time_data) > 100:
             self.time_data = self.time_data[-100:]
             self.depth_data = self.depth_data[-100:]
         
-        # Update plot
         self.depth_line.set_data(self.time_data, self.depth_data)
         self.current_pos.set_data([current_time], [self.current_depth])
         
-        # Adjust axes
         self.ax.relim()
         self.ax.autoscale_view()
         self.ax.set_xlim(left=max(0, current_time-50), right=current_time+5)
         
-        # Redraw
         self.canvas.draw()
     
     def check_alerts(self):
-        # Check for critical conditions
         alerts = []
         
         if self.spo2 < 90:
@@ -375,7 +346,6 @@ class DivingMonitorApp:
         if self.decompression_stop_active and self.current_depth > self.decompression_stop_depth + 2:
             alerts.append(f"MISSED DECO STOP AT {self.decompression_stop_depth}m")
         
-        # Update alert panel
         if alerts:
             self.alert_label.config(text="\n".join(alerts))
             self.alert_frame.pack(fill=tk.X, padx=10, pady=5)
@@ -383,13 +353,11 @@ class DivingMonitorApp:
             self.alert_frame.pack_forget()
     
     def simulate_dive(self):
-        # Simulate a dive profile
         if not hasattr(self, 'dive_phase'):
-            self.dive_phase = 'descending'  # 'descending', 'bottom', 'ascending', 'surface'
+            self.dive_phase = 'descending'
             self.max_depth = random.randint(15, 40)
             self.bottom_time = random.randint(5, 20)
         
-        # Update metrics based on dive phase
         if self.dive_phase == 'descending':
             self.current_depth = min(self.current_depth + random.uniform(0.5, 2), self.max_depth)
             self.ascent_rate = 0
@@ -410,7 +378,7 @@ class DivingMonitorApp:
                 self.dive_phase = 'ascending'
         
         elif self.dive_phase == 'ascending':
-            ascent_speed = random.uniform(5, 15)  # Can be dangerous!
+            ascent_speed = random.uniform(5, 15)
             self.current_depth = max(0, self.current_depth - ascent_speed * 0.1)
             self.ascent_rate = ascent_speed
             self.heart_rate = 70 + int(ascent_speed * 2)
@@ -425,18 +393,14 @@ class DivingMonitorApp:
             self.heart_rate = 65 + random.randint(-5, 5)
             self.spo2 = 98 + random.randint(-2, 2)
         
-        # Add some random variation
         self.spo2 += random.randint(-1, 1)
         self.heart_rate += random.randint(-2, 2)
         
-        # Update the display
         self.update_metrics()
         
-        # Continue simulation
         if self.dive_phase != 'surface':
             self.root.after(500, self.simulate_dive)
         else:
-            # Reset after a pause
             self.root.after(5000, self.reset_simulation)
     
     def reset_simulation(self):
